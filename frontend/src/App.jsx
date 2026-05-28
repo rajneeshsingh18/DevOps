@@ -1,4 +1,5 @@
 import "./App.css"
+import { Editor } from "@monaco-editor/react"
 
 function App() {
 
@@ -9,6 +10,12 @@ function App() {
 
       </aside>
       <section className="w-3/4 bg-neutral-700 rounded-lg">
+      <Editor
+      height="100%"
+      defaultLanguage="javaScript"
+      defaultValue="// Some Comment"
+      theme="vs-dark"
+      />
       </section>
 
     </main>

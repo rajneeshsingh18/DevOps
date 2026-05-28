@@ -4,60 +4,69 @@ This repository documents my step-by-step progress in mastering **Docker** and *
 
 ---
 
-## 🛠 Step 1: Setting up React + Tailwind CSS (Vite)
+## 🛠 Step 1: Setting up React + Tailwind CSS v4 (Vite)
 
-As a beginner, the first step was setting up a modern frontend environment using Vite and Tailwind CSS.
+In this step, I set up a modern frontend environment using Vite, **Tailwind CSS v4**, and integrated the **Monaco Editor**.
 
 ### 1. Create the React Project
-If you haven't already, create a new Vite project:
 ```bash
 npm create vite@latest frontend -- --template react
 cd frontend
 npm install
 ```
 
-### 2. Install Tailwind CSS
-Install Tailwind and its peer dependencies via npm:
+### 2. Install Tailwind CSS v4 & Monaco Editor
+Tailwind v4 uses a dedicated Vite plugin for better performance and simpler configuration.
 ```bash
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install tailwindcss @tailwindcss/vite @monaco-editor/react monaco-editor
 ```
-This creates `tailwind.config.js` and `postcss.config.js`.
 
-### 3. Configure Template Paths
-Update `tailwind.config.js` to include all your component files:
+### 3. Configure Vite Plugin
+Unlike v3, Tailwind v4 is integrated directly into `vite.config.js`:
 ```javascript
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite"
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss()
   ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
+})
 ```
 
-### 4. Add Tailwind Directives to CSS
-Open `./src/index.css` (or `App.css`) and replace its content with:
+### 4. Add Tailwind Import
+In Tailwind v4, you only need one import in your main CSS file (e.g., `src/App.css`):
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 ```
 
-### 5. Verify Installation
-Use a Tailwind class in `App.jsx` to test:
+### 5. Implementing Monaco Editor
+I integrated the Monaco Editor into `App.jsx` for a code-editing experience:
 ```jsx
+import "./App.css"
+import { Editor } from "@monaco-editor/react"
+
 function App() {
   return (
-    <h1 className="text-3xl font-bold underline text-blue-600">
-      Hello Tailwind!
-    </h1>
+    <main className="h-screen w-full bg-gray-950 flex gap-4">
+      <aside className="h-full w-1/4 bg-amber-50 rounded-lg">
+        {/* Sidebar content */}
+      </aside>
+      <section className="w-3/4 bg-neutral-700 rounded-lg">
+        <Editor
+          height="100%"
+          defaultLanguage="javascript"
+          defaultValue="// Start coding here..."
+          theme="vs-dark"
+        />
+      </section>
+    </main>
   )
 }
+
+export default App
 ```
 
 ### 6. Run the Development Server
@@ -68,7 +77,7 @@ npm run dev
 ---
 
 ## 📅 Roadmap
-- [x] Step 1: React + Tailwind CSS Setup
+- [x] Step 1: React + Tailwind CSS v4 + Monaco Editor Setup
 - [ ] Step 2: Dockerizing the Frontend
 - [ ] Step 3: Introduction to AWS (S3, EC2)
 - [ ] Step 4: CI/CD with GitHub Actions
