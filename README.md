@@ -76,9 +76,77 @@ npm run dev
 
 ---
 
+## 🛠 Step 2: Creating Backend with Socket.io & Yjs
+
+In this step, I built the collaborative backend using **Express**, **Socket.io**, and **Yjs** (via `y-socket.io`) to handle real-time code synchronization.
+
+### 1. Initialize the Backend
+```bash
+mkdir backend
+cd backend
+npm init -y
+```
+
+### 2. Install Dependencies
+```bash
+npm install express socket.io y-socket.io
+npm install -D nodemon
+```
+
+### 3. Configure `package.json`
+Set the type to "module" to use ESM imports:
+```json
+{
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  }
+}
+```
+
+### 4. Create the Server (`server.js`)
+The server initializes Socket.io and attaches the Yjs provider:
+```javascript
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { YSocketIO } from "y-socket.io/dist/server";
+
+const app = express();
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+// Initialize Yjs Socket.io provider
+const ySocketIO = new YSocketIO(io);
+ySocketIO.initialize();
+
+app.get("/health", (req, res) => {
+    res.status(200).json({ message: "ok", success: true });
+});
+
+httpServer.listen(3000, () => {
+    console.log("Server is running on port 3000");
+});
+```
+
+### 5. Running the Backend
+```bash
+npm run dev
+```
+
+---
+
 ## 📅 Roadmap
 - [x] Step 1: React + Tailwind CSS v4 + Monaco Editor Setup
-- [ ] Step 2: Dockerizing the Frontend
-- [ ] Step 3: Introduction to AWS (S3, EC2)
-- [ ] Step 4: CI/CD with GitHub Actions
-- [ ] Step 5: Orchestration with Docker Compose
+- [x] Step 2: Collaborative Backend (Socket.io + Yjs)
+- [ ] Step 3: Dockerizing the Application (Frontend & Backend)
+- [ ] Step 4: Introduction to AWS (S3, EC2)
+- [ ] Step 5: CI/CD with GitHub Actions
+- [ ] Step 6: Orchestration with Docker Compose

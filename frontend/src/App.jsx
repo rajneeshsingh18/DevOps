@@ -9,7 +9,7 @@ function App() {
       <aside className="h-full w-1/4 bg-amber-50 rounded-lg">
 
       </aside>
-      <section className="w-3/4 bg-neutral-700 rounded-lg">
+      <section className="w-3/4 bg-neutral-700 rounded-lg overflow-hidden">
       <Editor
       height="100%"
       defaultLanguage="javaScript"
