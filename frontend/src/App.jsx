@@ -1,7 +1,37 @@
 import "./App.css"
 import { Editor } from "@monaco-editor/react"
+import { MonacoBinding } from "y-monaco"
+import {useRef , useMemo} from "react"
+
+import * as Y from "yjs"; 
+
+import {SocketIOProvider} from "y-socket.io";
 
 function App() {
+
+  const editorRef = useRef(null);
+
+  const ydoc = useMemo(() => new Y.Doc(), [])
+
+  const yText = useMemo(()=> ydoc.getText("monaco"),[ydoc])
+
+
+
+  const handleMount = (editor) =>{
+
+    editorRef.current = editor
+
+    const provider = new SocketIOProvider("http://localhost:3000" , "monaco", ydoc,
+      {autoConnect : true,}
+    )
+    const monacoBinding = new MonacoBinding(
+      yText,
+      editorRef.current.getModel(),
+      new Set([editor]),
+      provider.awareness
+    )
+
+  }
 
   return (
     <main className="h-screen w-full bg-gray-950 flex gap-4">
@@ -12,9 +42,10 @@ function App() {
       <section className="w-3/4 bg-neutral-700 rounded-lg overflow-hidden">
       <Editor
       height="100%"
-      defaultLanguage="javaScript"
+      defaultLanguage="javascript"
       defaultValue="// Some Comment"
       theme="vs-dark"
+      onMount={handleMount}
       />
       </section>
 

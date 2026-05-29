@@ -143,10 +143,76 @@ npm run dev
 
 ---
 
+## 🛠 Step 3: Setting up Yjs in React Frontend
+
+In this step, I connected the React frontend to the collaborative backend using **Yjs**, **y-socket.io**, and **y-monaco**.
+
+### 1. Install Frontend Dependencies
+```bash
+npm install yjs y-socket.io y-monaco
+```
+
+### 2. Implementation in `App.jsx`
+The frontend needs to initialize a Y.Doc, connect to the socket provider, and bind the Yjs text type to the Monaco Editor instance.
+
+```jsx
+import { Editor } from "@monaco-editor/react"
+import { MonacoBinding } from "y-monaco"
+import { useRef, useMemo } from "react"
+import * as Y from "yjs"
+import { SocketIOProvider } from "y-socket.io"
+
+function App() {
+  const editorRef = useRef(null)
+  
+  // 1. Initialize Y.Doc (persisted across renders)
+  const ydoc = useMemo(() => new Y.Doc(), [])
+  
+  // 2. Define the shared text type
+  const yText = useMemo(() => ydoc.getText("monaco"), [ydoc])
+
+  const handleMount = (editor) => {
+    editorRef.current = editor
+
+    // 3. Initialize Socket.io Provider
+    const provider = new SocketIOProvider("http://localhost:3000", "monaco", ydoc, {
+      autoConnect: true,
+    })
+
+    // 4. Bind Yjs to Monaco Editor
+    const monacoBinding = new MonacoBinding(
+      yText,
+      editorRef.current.getModel(),
+      new Set([editor]),
+      provider.awareness
+    )
+  }
+
+  return (
+    <main className="h-screen w-full bg-gray-950 flex gap-4">
+      <section className="w-full bg-neutral-700 overflow-hidden">
+        <Editor
+          height="100%"
+          defaultLanguage="javascript"
+          theme="vs-dark"
+          onMount={handleMount} // Critical: Connects Yjs on editor load
+        />
+      </section>
+    </main>
+  )
+}
+```
+
+### 💡 Key Learning: `onMount` Connection
+The synchronization logic must be placed inside the `onMount` handler of the `@monaco-editor/react` component. This ensures that the editor instance and its model are fully loaded before Yjs attempts to bind to them.
+
+---
+
 ## 📅 Roadmap
 - [x] Step 1: React + Tailwind CSS v4 + Monaco Editor Setup
 - [x] Step 2: Collaborative Backend (Socket.io + Yjs)
-- [ ] Step 3: Dockerizing the Application (Frontend & Backend)
-- [ ] Step 4: Introduction to AWS (S3, EC2)
-- [ ] Step 5: CI/CD with GitHub Actions
-- [ ] Step 6: Orchestration with Docker Compose
+- [x] Step 3: Frontend Yjs Integration
+- [ ] Step 4: Dockerizing the Application (Frontend & Backend)
+- [ ] Step 5: Introduction to AWS (S3, EC2)
+- [ ] Step 6: CI/CD with GitHub Actions
+- [ ] Step 7: Orchestration with Docker Compose
