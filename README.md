@@ -208,11 +208,75 @@ The synchronization logic must be placed inside the `onMount` handler of the `@m
 
 ---
 
+## 🛠 Step 4: Multi-User Awareness (Presence Tracking)
+
+In this step, I added **Presence Tracking** to show who else is in the room and see their cursors in real-time.
+
+### 1. The Concept of "Awareness"
+Yjs provides an **Awareness** protocol that allows users to share transient state (like mouse position, cursor selection, or usernames) without persisting it to the document.
+
+### 2. Implementing User State
+I used the `provider.awareness` object to set a local "user" state and listen for changes from other clients.
+
+```javascript
+// Set local user info
+provider.awareness.setLocalStateField("user", { username: "John Doe" });
+
+// Listen for updates from others
+provider.awareness.on("change", () => {
+  const states = Array.from(provider.awareness.getStates().values());
+  const activeUsers = states
+    .filter(state => state.user)
+    .map(state => state.user);
+  
+  setUsers(activeUsers); // Update React state to show user list
+});
+```
+
+### 3. Integrated implementation in `App.jsx`
+The updated `App.jsx` now includes a "Join" screen and a sidebar to list active collaborators:
+
+```jsx
+function App() {
+  const [username, setUsername] = useState("");
+  const [users, setUsers] = useState([]);
+  const providerRef = useRef(null);
+
+  useEffect(() => {
+    if (username) {
+      const provider = new SocketIOProvider("http://localhost:3000", "monaco", ydoc);
+      providerRef.current = provider;
+
+      // Broadcast username to others
+      provider.awareness.setLocalStateField("user", { username });
+
+      // Sync user list on change
+      provider.awareness.on("change", () => {
+        const states = Array.from(provider.awareness.getStates().values());
+        setUsers(states.filter(s => s.user).map(s => s.user));
+      });
+
+      return () => provider.disconnect();
+    }
+  }, [username]);
+
+  // handleMount then uses providerRef.current.awareness for MonacoBinding...
+}
+```
+
+### 4. Key UI Features Added:
+- **Join Screen**: A simple form to collect the user's name before entering the editor.
+- **Active User Sidebar**: A dynamic list that updates in real-time whenever a user joins or leaves.
+- **Remote Cursors**: Because `provider.awareness` is passed to `MonacoBinding`, users can now see each other's color-coded cursors.
+
+---
+
 ## 📅 Roadmap
 - [x] Step 1: React + Tailwind CSS v4 + Monaco Editor Setup
 - [x] Step 2: Collaborative Backend (Socket.io + Yjs)
 - [x] Step 3: Frontend Yjs Integration
-- [ ] Step 4: Dockerizing the Application (Frontend & Backend)
-- [ ] Step 5: Introduction to AWS (S3, EC2)
-- [ ] Step 6: CI/CD with GitHub Actions
-- [ ] Step 7: Orchestration with Docker Compose
+- [x] Step 4: Multi-User Awareness & Presence
+- [ ] Step 5: Dockerizing the Application (Frontend & Backend)
+- [ ] Step 6: Introduction to AWS (S3, EC2)
+- [ ] Step 7: CI/CD with GitHub Actions
+- [ ] Step 8: Orchestration with Docker Compose
