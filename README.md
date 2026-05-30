@@ -271,12 +271,42 @@ function App() {
 
 ---
 
+## 🛠 Step 5: Introduction to Docker
+
+In this step, I transitioned from local development to **Containerization**.
+
+### ❓ Why use Docker?
+Docker solves the "It works on my machine" problem by packaging code, runtime, system tools, and libraries into a single **container**.
+- **Consistency**: The exact same environment runs on your laptop, your teammate's PC, and the AWS cloud.
+- **Isolation**: Prevent dependency conflicts between different projects (e.g., Project A needs Node 14, Project B needs Node 20).
+- **Scalability**: Containers can be spun up or down in seconds, making it easy to handle high traffic.
+
+### 🪟 Installing Docker on Windows
+1. **System Requirements**: Ensure you have Windows 10/11 Pro, Enterprise, or Home with **WSL2** enabled.
+2. **Download**: Go to [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) and download the installer.
+3. **Install**: Run the `.exe` and ensure "Use WSL 2 instead of Hyper-V" is checked.
+4. **Restart**: Your computer will likely need a restart to finalize WSL2 components.
+5. **Verify**: Open PowerShell and type:
+   ```bash
+   docker --version
+   docker run hello-world
+   ```
+
+### 🚢 Next Up: Creating Dockerfiles
+To containerize our application, we need to create a instructions file for Docker:
+- `frontend/Dockerfile`: For our React + Vite app.
+- `backend/Dockerfile`: For our Node.js + Socket.io app.
+- `.dockerignore`: To prevent heavy `node_modules` from being copied into the image.
+
+---
+
 ## 📅 Roadmap
 - [x] Step 1: React + Tailwind CSS v4 + Monaco Editor Setup
 - [x] Step 2: Collaborative Backend (Socket.io + Yjs)
 - [x] Step 3: Frontend Yjs Integration
 - [x] Step 4: Multi-User Awareness & Presence
-- [ ] Step 5: Dockerizing the Application (Frontend & Backend)
-- [ ] Step 6: Introduction to AWS (S3, EC2)
-- [ ] Step 7: CI/CD with GitHub Actions
-- [ ] Step 8: Orchestration with Docker Compose
+- [x] Step 5: Introduction to Docker & Installation
+- [ ] Step 6: Dockerizing the Application (Frontend & Backend)
+- [ ] Step 7: Introduction to AWS (S3, EC2)
+- [ ] Step 8: CI/CD with GitHub Actions
+- [ ] Step 9: Orchestration with Docker Compose
