@@ -300,13 +300,60 @@ To containerize our application, we need to create a instructions file for Docke
 
 ---
 
+## 🛠 Step 6: Multi-Stage Dockerization
+
+In this step, I created a **Multi-Stage Dockerfile** to build the frontend and serve it via the backend in a single, optimized container.
+
+### 1. The Multi-Stage Concept
+Instead of having two separate containers, we use one Dockerfile with two `FROM` instructions:
+- **Stage 1 (Build)**: Compiles the React frontend into static files (the `dist` folder).
+- **Stage 2 (Runtime)**: Sets up the Node.js backend and copies the `dist` files into the backend's `public` folder.
+
+### 2. The Optimized `Dockerfile`
+```dockerfile
+# --- Stage 1: Frontend Build ---
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+COPY ./frontend/package*.json ./
+RUN npm install
+COPY ./frontend .
+RUN npm run build
+
+# --- Stage 2: Backend Runtime ---
+FROM node:20-alpine
+WORKDIR /app
+COPY ./backend/package*.json ./
+RUN npm install
+COPY ./backend .
+# Copy built frontend assets from the builder stage
+COPY --from=frontend-builder /app/dist /app/public
+
+CMD ["node", "server.js"]
+```
+
+### 💡 Troubleshooting: Circular Dependencies
+During this step, I learned that every `COPY --from=stage-name` requires that stage to be finished. If you forget the second `FROM` statement, Docker gets confused and thinks you are trying to copy from the current stage into itself, causing a **Circular Dependency Error**.
+
+### 3. Build and Run Commands
+To build the image:
+```bash
+docker build -t collaborative-editor .
+```
+
+To run the container:
+```bash
+docker run -p 3000:3000 collaborative-editor
+```
+
+---
+
 ## 📅 Roadmap
 - [x] Step 1: React + Tailwind CSS v4 + Monaco Editor Setup
 - [x] Step 2: Collaborative Backend (Socket.io + Yjs)
 - [x] Step 3: Frontend Yjs Integration
 - [x] Step 4: Multi-User Awareness & Presence
 - [x] Step 5: Introduction to Docker & Installation
-- [ ] Step 6: Dockerizing the Application (Frontend & Backend)
+- [x] Step 6: Multi-Stage Dockerization
 - [ ] Step 7: Introduction to AWS (S3, EC2)
 - [ ] Step 8: CI/CD with GitHub Actions
 - [ ] Step 9: Orchestration with Docker Compose
